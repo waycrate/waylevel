@@ -1,0 +1,12 @@
+[package]
+authors = ["Shinyzenith <aakash@shinyzenith.xyz>"]
+edition = "2021"
+name = "waytop"
+version = "0.1.0"
+
+[dependencies]
+smithay-client-toolkit = "0.15.3"
+
+[[bin]]
+name = "waytop"
+path = "src/waytop.rs"
