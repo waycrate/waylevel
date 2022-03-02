@@ -1,13 +1,37 @@
 mod clap;
+mod output;
 mod toplevel;
 use serde::{Deserialize, Serialize};
+use smithay_client_toolkit::reexports::client::{Display, GlobalManager};
 use std::process::exit;
 
+// We recreate each struct and cherry pick the data because not all the fields
+// can be denoted as valid JSON via serde_json.
 #[derive(Serialize, Deserialize, Default, Debug, Clone, PartialEq, Eq)]
 struct ToplevelHandleDataJSON {
     title: String,
     app_id: String,
     state: toplevel::ToplevelHandleStates,
+}
+
+#[derive(Serialize, Deserialize, Default, Debug, Clone, PartialEq, Eq)]
+struct OutputModeJSON {
+    dimensions: (i32, i32),
+    refresh_rate: String,
+    is_current: bool,
+    is_preferred: bool,
+}
+
+#[derive(Serialize, Deserialize, Default, Debug, Clone, PartialEq, Eq)]
+struct OutputInfoJSON {
+    id: u32,
+    model: String,
+    make: String,
+    name: String,
+    description: String,
+    scale_factor: i32,
+    modes: Vec<OutputModeJSON>,
+    is_obsolete: bool,
 }
 
 fn main() -> () {
@@ -23,6 +47,13 @@ fn main() -> () {
         println!(
             "{}",
             serde_json::to_string_pretty(&populate_json_struct(toplevels)).unwrap()
+        );
+    } else if args.is_present("globals") {
+        print_compositor_globals();
+    } else if args.is_present("outputs") {
+        println!(
+            "{}",
+            serde_json::to_string_pretty(&print_output_info()).unwrap()
         );
     } else {
         print_human_readable(toplevels);
@@ -69,4 +100,49 @@ fn populate_json_struct(
         });
     }
     json_toplevel
+}
+
+fn print_compositor_globals() {
+    let display = Display::connect_to_env().unwrap();
+    let mut event_queue = display.create_event_queue();
+    let attached_display = (*display).clone().attach(event_queue.token());
+
+    let globals = GlobalManager::new(&attached_display);
+
+    event_queue
+        .sync_roundtrip(&mut (), |_, _, _| unreachable!())
+        .unwrap();
+
+    for (id, interface, version) in globals.list() {
+        println!("{}: {} (version {})", id, interface, version);
+    }
+}
+
+fn print_output_info() -> Vec<OutputInfoJSON> {
+    let display = Display::connect_to_env().unwrap();
+    let outputs = output::get_valid_outputs(display);
+    let mut output_info: Vec<OutputInfoJSON> = Vec::new();
+    for (_, info) in outputs {
+        let mut modes: Vec<OutputModeJSON> = Vec::new();
+        for mode in info.modes {
+            let refresh_rate = (mode.refresh_rate / 1000).to_string() + " Hz";
+            modes.push(OutputModeJSON {
+                dimensions: mode.dimensions,
+                refresh_rate: refresh_rate,
+                is_current: mode.is_current,
+                is_preferred: mode.is_preferred,
+            });
+        }
+        output_info.push(OutputInfoJSON {
+            id: info.id,
+            model: info.model,
+            make: info.make,
+            name: info.name,
+            description: info.description,
+            scale_factor: info.scale_factor,
+            modes: modes,
+            is_obsolete: info.obsolete,
+        });
+    }
+    output_info
 }
