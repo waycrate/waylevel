@@ -1,4 +1,4 @@
-BINARY := waytop
+BINARY := waylevel
 BUILDFLAGS := --release
 TARGET_DIR := /usr/bin
 SOURCE_DIR := ./target/release
