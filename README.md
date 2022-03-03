@@ -14,7 +14,7 @@
 # Installation
 
 ## AUR:
-`waylevel-git` will be packaged soon.
+`waylevel-git` & `waylevel-bin` will be packaged soon.
 
 ## Compile time dependencies:
 -   rustup
