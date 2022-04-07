@@ -34,7 +34,7 @@ struct OutputInfoJSON {
     is_obsolete: bool,
 }
 
-fn main() -> () {
+fn main() {
     let args = clap::set_flags().get_matches();
     let toplevels = match toplevel::get_toplevel_data() {
         Ok(toplevel) => toplevel,
@@ -61,30 +61,28 @@ fn main() -> () {
 }
 
 fn print_human_readable(toplevels: Vec<toplevel::ToplevelHandleData>) {
-    let mut count = 0;
-    for toplevel in toplevels {
+    for (count, toplevel) in toplevels.into_iter().enumerate() {
         let mut state = String::new();
         match toplevel.state.is_maximized {
-            true => state = state + "m",
-            false => state = state + "-",
+            true => state += "m",
+            false => state += "-",
         };
         match toplevel.state.is_minimized {
-            true => state = state + "m",
-            false => state = state + "-",
+            true => state += "m",
+            false => state += "-",
         };
         match toplevel.state.is_activated {
-            true => state = state + "a",
-            false => state = state + "-",
+            true => state += "a",
+            false => state += "-",
         };
         match toplevel.state.is_fullscreen {
-            true => state = state + "f",
-            false => state = state + "-",
+            true => state += "f",
+            false => state += "-",
         };
         println!(
             "{}: {} \"{}\" {}",
             count, state, toplevel.title, toplevel.app_id
         );
-        count += 1;
     }
 }
 
@@ -128,7 +126,7 @@ fn print_output_info() -> Vec<OutputInfoJSON> {
             let refresh_rate = (mode.refresh_rate / 1000).to_string() + " Hz";
             modes.push(OutputModeJSON {
                 dimensions: mode.dimensions,
-                refresh_rate: refresh_rate,
+                refresh_rate,
                 is_current: mode.is_current,
                 is_preferred: mode.is_preferred,
             });
@@ -140,7 +138,7 @@ fn print_output_info() -> Vec<OutputInfoJSON> {
             name: info.name,
             description: info.description,
             scale_factor: info.scale_factor,
-            modes: modes,
+            modes,
             is_obsolete: info.obsolete,
         });
     }

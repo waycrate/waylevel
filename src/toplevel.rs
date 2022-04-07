@@ -71,8 +71,8 @@ pub fn get_toplevel_data() -> Result<Vec<ToplevelHandleData>, Box<dyn Error>> {
                             }
                             if !is_present {
                                 let toplevel_data = ToplevelHandleData {
-                                    handle: toplevel.clone().detach(),
-                                    title: title,
+                                    handle: toplevel.detach(),
+                                    title,
                                     app_id: String::from("None"),
                                     state: ToplevelHandleStates::default(),
                                 };
@@ -92,9 +92,9 @@ pub fn get_toplevel_data() -> Result<Vec<ToplevelHandleData>, Box<dyn Error>> {
                             }
                             if !is_present {
                                 let toplevel_data = ToplevelHandleData {
-                                    handle: toplevel.clone().detach(),
+                                    handle: toplevel.detach(),
                                     title: String::from("None"),
-                                    app_id: app_id,
+                                    app_id,
                                     state: ToplevelHandleStates::default(),
                                 };
                                 toplevel_handle_data.borrow_mut().push(toplevel_data);
@@ -140,15 +140,12 @@ pub fn get_toplevel_data() -> Result<Vec<ToplevelHandleData>, Box<dyn Error>> {
                             }
                             if !is_present {
                                 let toplevel_data = ToplevelHandleData {
-                                    handle: toplevel.clone().detach(),
+                                    handle: toplevel.detach(),
                                     title: String::from("None"),
                                     app_id: String::from("None"),
                                     state: state_data,
                                 };
                                 toplevel_handle_data.borrow_mut().push(toplevel_data);
-                            }
-                            if state.len() == 0 {
-                                return;
                             }
                         }
                         zwlr_foreign_toplevel_handle_v1::Event::Done { .. } => {}
