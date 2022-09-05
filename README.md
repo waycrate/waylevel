@@ -8,6 +8,8 @@
   <img src="https://img.shields.io/github/issues/waycrate/waylevel?style=flat-square&logo=appveyor">
   <img src="https://img.shields.io/github/forks/waycrate/waylevel?style=flat-square&logo=appveyor">
   <img src="https://img.shields.io/github/stars/waycrate/waylevel?style=flat-square&logo=appveyor">
+  <br>
+    <img src="https://repology.org/badge/vertical-allrepos/waylevel.svg">
   </p>
 </p>
 
